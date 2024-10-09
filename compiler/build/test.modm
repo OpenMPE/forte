@@ -1,0 +1,9 @@
+(ARRAY)<-
+* 12f
+* 13f
+*
+*->
+
+(OBJECT)%
+    ["MODULATION"] :: 15f " f is for float
+%
