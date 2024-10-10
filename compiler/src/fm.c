@@ -6,6 +6,8 @@
 #include <string.h>
 #include <sys/types.h>
 
+
+
 int bundle(FILE *script, FILE *manifest){
     FILE *bundle = fopen("bundle.fm", "wb");
     if(bundle == NULL){
@@ -22,9 +24,15 @@ int bundle(FILE *script, FILE *manifest){
     
     int manifestSize = ftell(manifest);
     fseek(script, 0, SEEK_SET);
+    char *writeContentSC = malloc(scriptSize + 1);
+
     char *scriptContent = malloc(scriptSize + 1);
     fread(scriptContent, scriptSize, 1, script);
     fseek(manifest, 0, SEEK_SET);
+    for( int i = 0; i < scriptSize; i++){
+        
+        writeContentSC[i] = scriptContent[i] + 0xAC;
+    }
     char * manifestContent = malloc(manifestSize + 1);
     fread(manifestContent, manifestSize, 1, manifest);
     char header[2] = {'F','M'};
@@ -34,7 +42,7 @@ int bundle(FILE *script, FILE *manifest){
     fwrite(&totalSize, sizeof(totalSize), 1, bundle);
     fwrite(&scriptSize, sizeof(scriptSize), 1, bundle);
         printf("Script size: %d\n", scriptSize);
-    fwrite(scriptContent, scriptSize, 1, bundle);
+    fwrite(writeContentSC, scriptSize, 1, bundle);
     fwrite(&manifestSize, 4, 1, bundle);
     fwrite(manifestContent, manifestSize, 1, bundle);
     fclose(bundle);
@@ -70,7 +78,9 @@ int read(FILE* bundle){
     char *scriptContent = malloc(scriptSize + 1);
     memset(scriptContent, 0, scriptSize + 1);
     fread(scriptContent,1, scriptSize, bundle);
-    printf("Script content: %s\n", scriptContent);
-    fwrite(scriptContent,scriptSize,1, script);
+    for(int i = 0; i < scriptSize; i++){
+        scriptContent[i] = scriptContent[i] - 0xAC;
+    }
+    fwrite(scriptContent, scriptSize, 1, script);
 
 }

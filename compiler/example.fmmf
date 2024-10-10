@@ -1,0 +1,13 @@
+Author: "Leviathenn"
+Module:
+  name: "example"
+  imports:
+    - "forte"
+    - "forte-ui"
+  Elements:
+    - name: "UI->Slider"
+    - handler: "example::change"
+  Modulation:
+    - Effects:
+        - name: "Volume"
+        - value: "example::volume"

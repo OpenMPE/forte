@@ -1,56 +1,61 @@
 /**
-    * @author Leviathenn
+ * @author Leviathenn
  */
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
-#include <dlfcn.h>
-enum {
-    COMPILE_TYPE_MANIFEST,
-    COMPILE_TYPE_BUILD
-} typedef compileType;
+#include <sys/types.h>
+#include <yaml.h>
+#include "fm.h"
 
-int main(int argc, char *argv[]) {
-    if(argc < 2) {
-        printf("Usage: %s <filename>\n", argv[0]);
-        return 1;
-    }
+int main(int argc, char *argv[]){
 
-    compileType type = COMPILE_TYPE_MANIFEST; // default
-    // load the .so file
-    void *handle = dlopen("./libmodparser.so", RTLD_LOCAL | RTLD_LAZY);
-     if (!handle) {
-        fputs (dlerror(), stderr);
-        exit(1);
-    }
-
-    char* (*cosine)();
-    char* error;
-    cosine = dlsym(handle, "echo");
-    if ((error = dlerror()) != NULL)  {
-        fputs(error, stderr);
-        exit(1);
-    }
-    printf("%s\n", cosine());
-    dlclose(handle);
-    for(int i = 1; i < argc; i++) {
-        if(strcmp(argv[i], "--compile-type") == 0) {
-
-            if(i + 1 < argc) {
-
-                if(strcmp(argv[i + 1], "manifest") == 0) {
-                    type = COMPILE_TYPE_MANIFEST;
-                } else if(strcmp(argv[i + 1], "build") == 0) {
-                    type = COMPILE_TYPE_BUILD;
-                } else {
-                    printf("Invalid compile type!\n");
-                }
-            } else {
-                printf("No argument after the flag!\n");
+    FILE *file;
+    FILE *manifest;
+    // check if the file compiler.fcc exists
+    FILE *compilerConfig = fopen("compiler.fcc", "r");
+    if(compilerConfig == NULL){
+        printf("Configuration mode set to \"DEFUALT\".\n");
+    
+            file = fopen(argv[1], "r");
+            if(file == NULL){
+                printf("File not found!\n");
+                return 1;
             }
+            manifest = fopen(argv[2], "r");
+            if(manifest == NULL){
+                printf("Manifest not found!\n");
+                return 1;
+            }
+    }else{
+        yaml_node_t *root = yaml_parse(compilerConfig);
+        yaml_node_t *config = yaml_get_child(root, "config");
+        yaml_node_t *sourceElement = yaml_get_child(config, 0);
+        char *sourcePath = yaml_get_value(sourceElement);
+        yaml_node_t *manifestElement = yaml_get_child(config, 1);
+        char *manifestPath = yaml_get_value(manifestElement);
+        file = fopen(sourcePath, "r");
+        if(file == NULL){
+            printf("File not found!\n");
+            return 1;
+        }
+        yaml_get_
+        manifest = fopen(manifestPath, "r");
+        if(manifest == NULL){
+            printf("Manifest not found!\n");
+            return 1;
         }
     }
-   
-    return 0;
-}
+
+    bundle(file, manifest);
+    FILE *bundle = fopen("bundle.fm", "rb");
+    if(bundle == NULL){
+        printf("Failed to create bundle.fm\n");
+        return 1;
+    }
+    read(bundle);
+    fclose(bundle);
+    fclose(file);
+    fclose(manifest);
+
+};
