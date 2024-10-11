@@ -10,14 +10,12 @@ CC = gcc	# Compiler
 
 # Compile all o files to a tmp directory
 all: $(OBJ)
-	make ../modparser
-	cp ../modparser/build/libmodparser.so ./build/
-	$(CC) -o ./build/compiler ./tmp/$(OBJ) -ldl
+	$(CC) -o ./build/compiler $(OBJ) -ldl -lyaml
 
 # Compile all c files to a tmp directory
 %.o: %.c
-	$(CC) -c $< -o ./tmp/$@
+	$(CC) -c $< -o $@
 
 # Clean all o files
 clean:
-	rm -f ./tmp/*.o
+	rm -f *.o

@@ -2,7 +2,9 @@
  * @author Leviathenn
  */
 
+#include "forte/ui.h"
 #define PI 3.1415926535
+
 int cos(int x){
     double cos = 1 - ((pow(x,2))/(2)) + ((pow(x,4))/(24)) - ((pow(x,6))/(1*2*3*4*5*6)) + ((pow(x,8))/(1*2*3*4*5*6*7*8)) - ((pow(x,10))/(1*2*3*4*5*6*7*8*9*10));
     return cos * ((PI)/(180)); 
