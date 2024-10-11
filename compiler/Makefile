@@ -2,7 +2,7 @@
 
 # compile all source filoes in the src directoru
 
-SRC = $(wildcard src/*.c)
+SRC = $(wildcard src/*.c src/*.cpp)
 
 OBJ = $(SRC:.c=.o)	# Replace .c with .y
 
@@ -10,7 +10,7 @@ CC = gcc	# Compiler
 
 # Compile all o files to a tmp directory
 all: $(OBJ)
-	$(CC) -o ./build/compiler $(OBJ) -ldl -lyaml
+	$(CC) -o ./build/compiler $(OBJ) -ldl -lyaml-cpp -lstdc++
 
 # Compile all c files to a tmp directory
 %.o: %.c
