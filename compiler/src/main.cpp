@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <yaml.h>
+#include <yaml-cpp/yaml.h>
+#include <iostream>
+#include <fstream>
 #include "fm.h"
 
 int main(int argc, char *argv[]){
@@ -28,32 +30,38 @@ int main(int argc, char *argv[]){
                 return 1;
             }
     }else{
-        yaml_node_t *root = yaml_parse(compilerConfig);
-        yaml_node_t *config = yaml_get_child(root, "config");
-        yaml_node_t *sourceElement = yaml_get_child(config, 0);
-        char *sourcePath = yaml_get_value(sourceElement);
-        yaml_node_t *manifestElement = yaml_get_child(config, 1);
-        char *manifestPath = yaml_get_value(manifestElement);
-        file = fopen(sourcePath, "r");
-        if(file == NULL){
-            printf("File not found!\n");
-            return 1;
-        }
-        yaml_get_
-        manifest = fopen(manifestPath, "r");
-        if(manifest == NULL){
-            printf("Manifest not found!\n");
-            return 1;
-        }
+        std::ifstream manifestStream("compiler.fcc");
+        YAML::Node manifestNode = YAML::LoadFile("compiler.fcc");
+        if(manifestNode["config"].IsDefined()){
+            std::vector<std::string> config = manifestNode["config"].as<std::vector<std::string>>();
+            file = fopen(config[0].c_str(), "r");
+            if(file == NULL){
+                printf("File not found!\n");
+                return 1;
+            }
+            manifest = fopen(config[1].c_str(), "r");
+            if(manifest == NULL){
+                printf("Manifest not found!\n");
+           
+            }
+
+        }else{
+            std::cout << "Config Not Defined!\n";
+            
+        };
     }
 
-    bundle(file, manifest);
+
     FILE *bundle = fopen("bundle.fm", "rb");
     if(bundle == NULL){
         printf("Failed to create bundle.fm\n");
         return 1;
     }
-    read(bundle);
+    fm *fmFile = new fm(file, manifest, "bundle.fm");
+    fmFile->bundle();
+    free(fmFile);
+    fm *newFile = new fm(bundle);
+    
     fclose(bundle);
     fclose(file);
     fclose(manifest);

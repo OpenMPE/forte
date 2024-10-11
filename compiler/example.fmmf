@@ -11,3 +11,4 @@ Module:
     - Effects:
         - name: "Volume"
         - value: "example::volume"
+    
